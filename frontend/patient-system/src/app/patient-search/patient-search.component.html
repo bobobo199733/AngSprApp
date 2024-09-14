@@ -1,0 +1,45 @@
+<div class="container">
+  <div class="card-body">
+    <h3 class="text-center text-dark">Patient Search</h3>
+</div>
+  <div class="card-body">
+    <div class="justify-content-center align-items-center">
+    <div class="row height d-flex justify-content-center align-items-center">
+      <div class="col-md-8">
+        <div class="search">
+          <i class="fa fa-search"></i>
+            <input type="text" 
+                  #searchText                  
+                  class="form-control" 
+                  id="searchPatient" 
+                  placeholder="Enter patient's name">
+          <button (click)="searchPatient(searchText.value)" class="btn btn-primary btn-block"> Search </button>
+          </div>
+          
+        <table class="table table-striped" *ngIf="patientFound">
+            <thead>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Gender</th>
+              <th>Date of birth</th>
+              <th>Phone number</th>
+              <th>Modify details</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{patient.id}}</td>
+                <td>{{patient.name}}</td>
+                <td>{{patient.gender}}</td>
+                <td>{{patient.dateOfBirth}}</td>
+                <td>{{patient.phoneNumber}}</td>
+                <td><button routerLink="/patient-form/{{patient.id}}" class="btn btn-primary btn-block"> Modify </button></td>
+              </tr>
+            </tbody>
+        </table>
+        <div class="card-footer-fail" *ngIf="patientNotFound">
+          <h4 class="text-center">Patient not found!</h4>
+      </div>
+      </div>
+    </div>
+    </div>
+</div>

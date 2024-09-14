@@ -1,0 +1,11 @@
+{
+  "patients": [
+    {
+      "id": "7502",
+      "name": "Bogdan Andrei",
+      "dateOfBirth": "1997-05-02",
+      "gender": "Male",
+      "phoneNumber": "+31682404410"
+    }
+  ]
+}
