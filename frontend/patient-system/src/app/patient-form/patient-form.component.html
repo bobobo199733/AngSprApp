@@ -20,9 +20,9 @@
                         <label for="gender">Gender</label>
                         <select formControlName="gender" id="gender">
                             <option selected disabled value="">Gender</option>
-                            <option>Male</option>
-                            <option>Female</option>
-                            <option>Other</option>
+                            <option>male</option>
+                            <option>female</option>
+                            <option>other</option>
                         </select>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                 <h4 class="text-center">Registration successful!</h4>
             </div>
             <div class="card-footer-fail" *ngIf="showFailMessage">
-                <h4 class="text-center">Patient already registered!</h4>
+                <h4 class="text-center">Patient not registered!</h4>
             </div>
         </div>
     </div>

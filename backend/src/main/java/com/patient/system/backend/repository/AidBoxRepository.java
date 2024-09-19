@@ -3,12 +3,8 @@ package com.patient.system.backend.repository;
 import java.net.http.HttpRequest;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
-import org.springframework.data.config.ConfigurationUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository

@@ -8,15 +8,15 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
 import org.json.JSONObject;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.patient.system.backend.control.SearchControl;
 import com.patient.system.backend.entity.Patient;
 import com.patient.system.backend.repository.AidBoxRepository;
 import com.patient.system.backend.repository.DataRepository;
-import com.patient.system.backend.repository.OpenSearchRepository;
 
 @Service
 public class DataService{
@@ -31,6 +31,8 @@ public class DataService{
     
     HttpResponse<String> response;
 
+    private static final Logger logger = LoggerFactory.getLogger(SearchControl.class);
+    
     //The JSONObject will *store* the response == the new patient's data
     //It was needed to get the value of the key "id" 
     JSONObject jsonObject;
@@ -71,9 +73,8 @@ public class DataService{
             jsonObject = new JSONObject(response.body());
             patient.setId(jsonObject.getString("id"));
 
-            //Console print outs for AidBox
-            System.out.println("Patient: " + patient.getId() + " successfully created!");
-            System.out.println(HttpStatus.CREATED);
+            //Log for AidBox
+            logger.info("Patient upserted successfully: {}", patient);
 
             //If the patient is successfully registered to AidBox
             //Then access Search Service endpoint to index the new patient in OpenSearch
@@ -100,17 +101,16 @@ public class DataService{
                 .header("Accept", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonPayload,StandardCharsets.UTF_8))
                 .build();
-
                 //Console print outs for OpenSearch
-                System.out.println("Patient: " + patient.getId() + " successfully indexed!");
+                logger.info("Patient indexed successfully in OpenSearch!");
                 response = client.send(request, HttpResponse.BodyHandlers.ofString());
             }
 
+            logger.info("Patient upserted successfully: {}", patient);
             return dataRepository.addPatient(patient);
 
         } catch (Exception e) {
-            System.out.println("Patient was not created!");
-            System.out.println(HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error occurred while upserting patient: {}", e.getMessage(), e);
             return null;
         } 
 
@@ -122,10 +122,6 @@ public class DataService{
      //   return dataRepository.updatePatient(patient, patientId);
    // }
 
-    //DELETE
-   // public void deletePatient(Patient patient, Long patientId){
-     //   dataRepository.deletePatient(patient, patientId);
-    //}
 
 
 }

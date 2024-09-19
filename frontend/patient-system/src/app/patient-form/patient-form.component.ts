@@ -1,8 +1,8 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Patient } from '../model/patient';
-import { HttpClientModule, HttpClient} from '@angular/common/http';
+import { HttpClientModule, HttpClient, HttpHeaders} from '@angular/common/http';
 import { patients } from '../../../db-mock/db.json';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -21,53 +21,38 @@ export class PatientFormComponent {
   
   patientForm: FormGroup;
   isFormSubmitted: boolean = false;
-  
-  patient = new Patient();
+
+  patient: Patient;
   patientList: Array<Patient> = patients;
 
   showSuccessMessage = false;
   showFailMessage = false;
   patientsResult: Patient[];
 
-  baseURL = "http://localhost:3000/patients";
-  
-  foundPatientId: string;
+  apiUrl = "http://localhost:8080/data/upsert/patient";
+  response: any;
 
-  getPacientById(pacientID : string){
-    return this.httpClient.get<Patient>(this.baseURL+"/"+this.foundPatientId);
-  }
-
-  updatePatient(pacientID: string, updatedData:any): Observable<Patient> {
-    return this.httpClient.put<Patient>(this.baseURL+"/"+this.foundPatientId, this.patient);
-  }
-
-  ///////////////////////////////
-  /// Patient form constructor //
+    ///////////////////////////////
+   /// Patient form constructor //
   ///////////////////////////////
   constructor(private httpClient: HttpClient, private route: ActivatedRoute, private router:Router){
-    this.patientForm = new FormGroup({
-      name: new FormControl("",[Validators.required, Validators.minLength(4)]), 
-      dateOfBirth: new FormControl("",[Validators.required]), 
-      gender: new FormControl("",[Validators.required]),
-      phoneNumber: new FormControl("",[Validators.required, Validators.pattern('(([+][(]?[0-9]{1,3}[)]?)|([(]?[0-9]{4}[)]?))\s*[)]?[-\s\.]?[(]?[0-9]{1,3}[)]?([-\s\.]?[0-9]{3})([-\s\.]?[0-9]{3,4})')      ])
-    })
-
-    //for pre-populated field
-    this.route.params.subscribe(params => {this.foundPatientId = params['pacientId'];  console.log('Test ID:', this.foundPatientId)});
-    if(this.foundPatientId !== ""){
-      this.getPacientById(this.foundPatientId).subscribe(foundPatient=>{
-        this.patient = foundPatient;
-        console.log(this.patient);
+        this.patientForm = new FormGroup({
+          name: new FormControl("",[Validators.required, Validators.minLength(4)]), 
+          dateOfBirth: new FormControl("",[Validators.required]), 
+          gender: new FormControl("",[Validators.required]),
+          phoneNumber: new FormControl("",[Validators.required, Validators.pattern('(([+][(]?[0-9]{1,3}[)]?)|([(]?[0-9]{4}[)]?))\s*[)]?[-\s\.]?[(]?[0-9]{1,3}[)]?([-\s\.]?[0-9]{3})([-\s\.]?[0-9]{3,4})')      ])
+        });
+        
+        //Prepopulate the form if route is from search patient
+        this.route.params.subscribe(params => {
+          let foundPatient = new Patient(params['name'],params['gender'],params['dateOfBirth'],params['phoneNumber']);
           this.patientForm.patchValue({
-            id: this.patient.id,
-            name: this.patient.name,
-            dateOfBirth: this.patient.dateOfBirth,
-            gender: this.patient.gender,
-            phoneNumber: this.patient.phoneNumber
-          }
-        )
-      });
-    } 
+            name: foundPatient.name,
+            gender: foundPatient.gender,
+            dateOfBirth: foundPatient.dateOfBirth,
+            phoneNumber: foundPatient.phoneNumber
+          });
+        });
   }
 
 
@@ -80,7 +65,8 @@ export class PatientFormComponent {
 
     
     if (isFormValid){
-      //debugger;
+
+      //Logic for duplicates - TODO
       //this.httpClient.get(this.baseURL).subscribe((data)=>{ this.data = this.patient}) 
      
       //  for(let i in this.patientList){
@@ -104,29 +90,31 @@ export class PatientFormComponent {
       //     
       //    }      
       //  }
-      
-      
-      //update part logic bricked
-      //if(this.foundPatientId === ""){
-      //  this.updatePatient(this.foundPatientId, this.patient).subscribe(patientUpdated=>{
-      //    this.patient.id = patientUpdated.id;
-      //    this.patient.name = patientUpdated.name;
-      //    this.patient.dateOfBirth = patientUpdated.dateOfBirth;
-      //    this.patient.gender = patientUpdated.gender;
-      //    this.patient.phoneNumber = patientUpdated.phoneNumber;})
-      //  } else {
 
-          this.patient.name = this.patientForm.controls['name'].value;
-          this.patient.dateOfBirth = this.patientForm.controls['dateOfBirth'].value;
-          this.patient.gender = this.patientForm.controls['gender'].value;
-          this.patient.phoneNumber = this.patientForm.controls['phoneNumber'].value;
-          this.showSuccessMessage = true;
-          this.httpClient.post(this.baseURL,this.patient).subscribe();  
-          this.showSuccessMessage = true;
+          //AidBox accepts only yyyy-MM-dd date format 
+          let date = new Date(this.patientForm.controls['dateOfBirth'].value);
+
+          this.patient = new Patient(
+            this.patientForm.controls['name'].value,
+            this.patientForm.controls['gender'].value,
+            formatDate(date,'yyyy-MM-dd',"en-US"),
+            this.patientForm.controls['phoneNumber'].value
+          )
           
-          setTimeout(()=>{this.router.navigate(['/patient-form']), 1500});
-
-      
+          const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+          this.httpClient.post<any>(this.apiUrl, this.patient, { headers }).subscribe({
+            next: (res: { id: string, name: string, gender: string, dateOfBirth: string, phoneNumber: string }) => {
+                console.log('Response from Aidbox:', res); //Log the response from AidBox
+                this.patient.id = res.id; // Assign the generated ID to the patient instance
+                this.showSuccessMessage = true;
+                setTimeout(function(){window.location.href="http://localhost:4200/patient-form";}, 1500);
+            },
+            error: (err) => {
+                this.showFailMessage = true;
+                setTimeout(function(){window.location.reload();}, 1500);
+                console.error('Error upserting patient:', err);
+            }
+          });
     }
  
   }
