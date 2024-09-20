@@ -97,6 +97,22 @@ services:
       AIDBOX_ZEN_DEV_MODE: "true"
       PGPORT: 5432
       PGHOST: aidbox-db
+    
+  frontend-angular:
+    image: frontend-angular
+    ports:
+      - 4200:4200
+    volumes:
+      - ./frontend/patient-system:/patient-system
+      - /patient-system/node_modules
+
+  backend-spring-boot:
+    image: backend-spring-boot
+    ports:
+      - "8080:8080"
+    depends_on:
+      - frontend-angular
+    
 volumes:
   opensearch-data1:
   opensearch-data2:

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/aidbox/zen-packages/hl7-fhir-r4-core" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/aidbox/zen-packages/hl7-terminology-r4" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/aidbox/zen-packages/zen.fhir" vcs="Git" />
+  </component>
+</project>
