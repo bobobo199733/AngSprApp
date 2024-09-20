@@ -36,7 +36,7 @@ public class OpenSearchRepository {
 
         return request;
     }
-
+//host.docker.internal
     //Search a patient HTTP request to OpenSearch
     public HttpRequest searchPatientFromOpenSearch(String patientName){
         //OpenSearch requires that the basic authentication header to be encoded to base65
@@ -46,7 +46,7 @@ public class OpenSearchRepository {
         
         //Register the patient to AidBox
         request = HttpRequest.newBuilder()
-        .uri(URI.create("https://localhost:9200/patients/_search?q=name:%22".concat(patientName).concat("%22?case_insensitive=true?pretty")))
+        .uri(URI.create("https://0.0.0.0:9200/patients/_search?q=name:%22".concat(patientName).concat("%22?case_insensitive=true?pretty")))
         .header("Authorization", authHeader) //OpenSearch auth.
         .GET()
         .build();

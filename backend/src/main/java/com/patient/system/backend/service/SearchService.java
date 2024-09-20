@@ -1,5 +1,6 @@
 package com.patient.system.backend.service;
 
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -10,13 +11,16 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import java.net.URLEncoder;
-
+import com.patient.system.backend.control.SearchControl;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
 import com.patient.system.backend.entity.Patient;
 import com.patient.system.backend.repository.OpenSearchRepository;
 import com.patient.system.backend.repository.SearchRepository;
@@ -28,7 +32,8 @@ public class SearchService {
 
     @Autowired
     private OpenSearchRepository openSearchRepository;
-    
+    private static final Logger logger = LoggerFactory.getLogger(SearchControl.class);
+
     HttpClient client;  
     HttpResponse<String> response;
 
@@ -39,13 +44,13 @@ public class SearchService {
     public Patient indexPatient(Patient patient){
         try {
             //HTTP client only for OpenSearch which trust all the SSL certificates
-            client = HttpClient.newBuilder().sslContext(createInsecureSSLContext()).build();  
+            client = HttpClient.newBuilder().sslContext(createInsecureSSLContext()).build();
             // Define the JSON payload for OpenSearch
             jsonPayload = String.format("""
                 {
                     "id" : "%s",
                     "name" : "%s",
-                    "gender" : "%s",                
+                    "gender" : "%s",
                     "dateOfBirth" : "%s",
                     "phoneNumber" : "%s"
                 }
@@ -114,6 +119,8 @@ public class SearchService {
             }
         } catch (Exception e) {
             System.out.println("Error in request to OpenSearch!");
+            e.printStackTrace();
+            logger.error("Error occurred while upserting patient: {}", e.getMessage(), e);
             System.out.println(HttpStatus.INTERNAL_SERVER_ERROR);
             return null;
         } 

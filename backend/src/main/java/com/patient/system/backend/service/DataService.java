@@ -96,7 +96,7 @@ public class DataService{
 
                 //Access via HttpRequest the Search Service endpoint to upsert the same patient in OpenSearch
                 HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/search/upsert/patient"))         
+                .uri(URI.create("http://localhost:8080/search/upsert/patient"))
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonPayload,StandardCharsets.UTF_8))

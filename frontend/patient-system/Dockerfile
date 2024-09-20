@@ -1,10 +1,10 @@
 FROM node:latest
 
-WORKDIR /patient-system
+WORKDIR /frontend/patient-system
 
 RUN npm install -g @angular/cli
 
-COPY package.json package-lock.json ./
+COPY /frontend/patient-system/package.json /frontend/patient-system/package-lock.json ./
 RUN npm i
 
 COPY . .

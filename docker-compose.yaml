@@ -99,17 +99,20 @@ services:
       PGHOST: aidbox-db
     
   frontend-angular:
-    image: frontend-angular
+    build:
+      dockerfile: frontend/patient-system/Dockerfile
     ports:
       - 4200:4200
     volumes:
-      - ./frontend/patient-system:/patient-system
-      - /patient-system/node_modules
+      - ./frontend/patient-system:/frontend/patient-system
+      - /frontend/patient-system/node_modules
 
   backend-spring-boot:
+    build:
+      dockerfile: backend/Dockerfile
     image: backend-spring-boot
     ports:
-      - "8080:8080"
+      - 8080:8080
     depends_on:
       - frontend-angular
     
