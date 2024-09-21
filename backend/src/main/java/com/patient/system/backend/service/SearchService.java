@@ -113,20 +113,22 @@ public class SearchService {
                 }
 
                 System.out.println("Patient was found!");
+                logger.info("Patient was found");
                 return searchRepository.indexPatient(patient);
             
             } else{
             
                 System.out.println("Patient was not found!");
+                logger.info("Patient was not found");
                 return null;
             
             }
         } catch (Exception e) {
             System.out.println("Error in request to OpenSearch!");
-            e.printStackTrace();
+            System.out.println(e);
+            System.out.println(e.getMessage());
             logger.error("Error occurred while upserting patient: {}", e.getMessage(), e);
             System.out.println(HttpStatus.INTERNAL_SERVER_ERROR);
-            System.out.println(e.getMessage());;
             return null;
         } 
 
@@ -151,7 +153,7 @@ public class SearchService {
         }
     }
 
-    // Disable SSL verification - I'm connect to OpenSearch from localhost
+    // Disable SSL verification
     // I'm using a self-signed SSL certificate, which is not trusted by the Java HttpClient.
     private static SSLContext createInsecureSSLContext() throws NoSuchAlgorithmException, KeyManagementException {
         TrustManager[] trustAllCertificates = new TrustManager[]{

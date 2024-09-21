@@ -5,6 +5,7 @@ import { RouterOutlet, RouterModule } from '@angular/router';
 import { HttpClientModule, HttpClient, HttpHeaders} from '@angular/common/http';
 
 import { Patient } from '../model/patient';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-patient-search',
@@ -16,7 +17,7 @@ import { Patient } from '../model/patient';
 
 export class PatientSearchComponent {
 
-  apiUrl = "http://localhost:8080/search/patient";
+  apiUrl = environment.springBootSearchSearchPatientURL;
 
   patient = new Patient('null', 'null', 'null', 'null');
   patientList: Array<Patient> = [];
@@ -52,9 +53,9 @@ export class PatientSearchComponent {
               );
               this.patient.id = res.id; // Assign the ID from the response
               this.patientFound = true;
+              this.patientNotFound = false;
             } else {
               this.patientNotFound = true;
-              setTimeout(function(){window.location.reload();}, 1500);
             }
           },
           error: (err) => {

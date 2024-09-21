@@ -78,15 +78,21 @@ public class DataService{
                 .header("Accept", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonPayload,StandardCharsets.UTF_8))
                 .build();
+
                 //Console print outs for OpenSearch
+                System.out.println("Patient indexed successfully in OpenSearch!");
                 logger.info("Patient indexed successfully in OpenSearch!");
                 response = client.send(request, HttpResponse.BodyHandlers.ofString());
             }
 
+            System.out.println("Patient upserted successfully!");
             logger.info("Patient upserted successfully: {}", patient);
             return dataRepository.addPatient(patient);
 
         } catch (Exception e) {
+            System.out.println("Error in request to AidBox!");
+            System.out.println(e);
+            System.out.println(e.getMessage());
             logger.error("Error occurred while upserting patient: {}", e.getMessage(), e);
             return null;
         } 

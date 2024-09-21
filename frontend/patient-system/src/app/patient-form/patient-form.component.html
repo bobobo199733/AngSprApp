@@ -44,9 +44,8 @@
                         </div>
                     </div>
                 </div>
-                <button type="submit" *ngIf="formSubmitButton" class="btn btn-primary btn-block" (click)="onSubmit()"> Submit </button>
-                <button type="submit" *ngIf="formUpdateButton" class="btn btn-primary btn-block" (click)="onUpdate()"> Update </button>
-
+                <button type="submit" *ngIf="patientForm.valid && formSubmitButton" class="btn btn-primary btn-block" (click)="onSubmit()"> Submit </button>
+                <button type="submit" *ngIf="patientForm.valid && formUpdateButton" class="btn btn-primary btn-block" (click)="onUpdate()"> Update </button>
             </form>
             <div class="card-footer-success" *ngIf="showSuccessMessage">
                 <h4 class="text-center">Registration successful!</h4>

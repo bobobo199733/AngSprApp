@@ -1,12 +1,11 @@
 import { CommonModule, formatDate } from '@angular/common';
+import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Patient } from '../model/patient';
-import { HttpClientModule, HttpClient, HttpHeaders} from '@angular/common/http';
+import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { patients } from '../../../db-mock/db.json';
-import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
-import { RouterOutlet, RouterModule, Router } from '@angular/router';
+import { Patient } from '../model/patient';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-patient-form',
@@ -31,8 +30,9 @@ export class PatientFormComponent {
   showFailMessage = false;
   patientsResult: Patient[];
 
-  apiUrl = "http://localhost:8080/data/upsert/patient";
-  apiUrl2 = "http://localhost:8080/search/update/patient";
+  apiUrl = environment.springBootDataInsertPatientURL;
+  apiUrl2 = environment.springBootSearchUpdatePatientURL;
+
   response: any;
 
   //To retrieve the id from the routing parameters (see constructor)
@@ -93,7 +93,8 @@ export class PatientFormComponent {
                 console.log('Response from Aidbox:', res); //Log the response from AidBox
                 this.patient.id = res.id; // Assign the generated ID to the patient instance
                 this.showSuccessMessage = true;
-                setTimeout(function(){window.location.href="http://localhost:4200/patient-form";}, 1500);
+                this.showFailMessage = false;
+                setTimeout(function(){window.location.href=environment.angularLandingPageURL;}, 1500);
             },
             error: (err) => {
                 this.showFailMessage = true;
@@ -128,7 +129,8 @@ export class PatientFormComponent {
             next: (res) => {
                 console.log('Response from Spring Boot:', res);
                 this.showSuccessMessage = true;
-                setTimeout(function(){window.location.href="http://localhost:4200/patient-form";}, 1500);
+                this.showFailMessage = false;
+                setTimeout(function(){window.location.href=environment.angularLandingPageURL;}, 1500);
             },
             error: (err) => {
                 this.showFailMessage = true;
