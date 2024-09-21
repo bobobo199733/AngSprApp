@@ -7,7 +7,7 @@
             <form [formGroup]="patientForm">
                 <div class="row">
                     <div class="form-group col-md-8">
-                        <label for="name">Full name</label>
+                        <label for="name">Full name *</label>
                         <input type="text" class="form-control" formControlName="name" id="name" placeholder="e.g., John Smith">
                         <div class="text-danger" *ngIf="patientForm.controls['name'].invalid && (isFormSubmitted || patientForm.controls['name'].touched || patientForm.controls['name'].dirty)">
                             <span class="text-danger" *ngIf="patientForm.controls['name'].errors?.['required']">The patient's full name is required!</span>
@@ -17,7 +17,7 @@
                 </div>
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="gender">Gender</label>
+                        <label for="gender">Gender *</label>
                         <select formControlName="gender" id="gender">
                             <option selected disabled value="">Gender</option>
                             <option>male</option>
@@ -28,7 +28,7 @@
                 </div>
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="dateOfBirth">Date Of Birth</label>
+                        <label for="dateOfBirth">Date Of Birth *</label>
                         <input type="date" class="form-control" id="dateOfBirth" formControlName="dateOfBirth">
                         <div class="text-danger" *ngIf="patientForm.controls['dateOfBirth'].invalid  && (patientForm.controls['dateOfBirth'].touched || patientForm.controls['dateOfBirth'].dirty)">
                             <span *ngIf="patientForm.controls['dateOfBirth'].errors?.['required']"> The patient's date of birth is required! </span>
@@ -36,15 +36,17 @@
                         </div>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="phoneNumber">Phone Number</label>
+                        <label for="phoneNumber">Phone Number *</label>
                         <input type="text" class="form-control" formControlName="phoneNumber" id="phoneNumber" placeholder="e.g., +31682404410">
                         <div class="text-danger" *ngIf="patientForm.controls['phoneNumber'].invalid   && (patientForm.controls['phoneNumber'].touched || patientForm.controls['phoneNumber'].dirty)">
                             <span *ngIf="patientForm.controls['phoneNumber'].errors?.['required']"> The patient's phone number is required! </span>
                             <span *ngIf="patientForm.controls['phoneNumber'].errors?.['pattern']"> The patient's phone number is not valid! </span>
-                        </div> 
+                        </div>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block" (click)="onSubmit()"> Submit </button>
+                <button type="submit" *ngIf="formSubmitButton" class="btn btn-primary btn-block" (click)="onSubmit()"> Submit </button>
+                <button type="submit" *ngIf="formUpdateButton" class="btn btn-primary btn-block" (click)="onUpdate()"> Update </button>
+
             </form>
             <div class="card-footer-success" *ngIf="showSuccessMessage">
                 <h4 class="text-center">Registration successful!</h4>

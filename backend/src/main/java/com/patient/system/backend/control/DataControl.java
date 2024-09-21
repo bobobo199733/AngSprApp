@@ -23,7 +23,7 @@ public class DataControl {
     @Autowired 
     private DataService dataService;
     
-    private static final Logger logger = LoggerFactory.getLogger(SearchControl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataControl.class);
 
     @PostMapping("/upsert/patient")
     public ResponseEntity<Patient> addPatient(@RequestBody Patient patient) {

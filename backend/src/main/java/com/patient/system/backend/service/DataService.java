@@ -11,9 +11,9 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.patient.system.backend.control.SearchControl;
 import com.patient.system.backend.entity.Patient;
 import com.patient.system.backend.repository.AidBoxRepository;
 import com.patient.system.backend.repository.DataRepository;
@@ -26,12 +26,13 @@ public class DataService{
 
     @Autowired
     private AidBoxRepository aidBoxRepository;
-
+    @Value("${bootUrlBase}")
+    private String bootUrlBase;
     HttpClient client = HttpClient.newHttpClient();  
     
     HttpResponse<String> response;
 
-    private static final Logger logger = LoggerFactory.getLogger(SearchControl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataService.class);
     
     //The JSONObject will *store* the response == the new patient's data
     //It was needed to get the value of the key "id" 
@@ -42,32 +43,8 @@ public class DataService{
     //Create a new patient
     public Patient addPatient(Patient patient){
         try {
-            //Patient FHIR format JSON payload
-            jsonPayload = String.format( """
-                    {
-                      "resourceType": "Patient",
-                      "name": [
-                          {
-                            "text": "%s"
-                          }
-                      ],
-                      "gender": "%s",
-                      "birthDate": "%s",
-                      "telecom": [
-                          {
-                            "system": "phone",
-                            "value": "%s"
-                          }
-                      ]
-                    }
-                    """,
-                    patient.getName(),
-                    patient.getGender(),
-                    patient.getDateOfBirth(),
-                    patient.getPhoneNumber());
-    
             //Register the patient to AidBox
-            response = client.send(aidBoxRepository.insertPatientToAidBox(jsonPayload), HttpResponse.BodyHandlers.ofString());
+            response = client.send(aidBoxRepository.insertPatientToAidBox(patient), HttpResponse.BodyHandlers.ofString());
 
             //Set the ID of the patient with the one assigned by AidBox
             jsonObject = new JSONObject(response.body());
@@ -96,7 +73,7 @@ public class DataService{
 
                 //Access via HttpRequest the Search Service endpoint to upsert the same patient in OpenSearch
                 HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/search/upsert/patient"))
+                .uri(URI.create(bootUrlBase.concat("/search/upsert/patient")))
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonPayload,StandardCharsets.UTF_8))
@@ -115,13 +92,4 @@ public class DataService{
         } 
 
     }
-
-    
-    //UPDATE
-   // public Patient updatePatient(Patient patient, Long patientId){
-     //   return dataRepository.updatePatient(patient, patientId);
-   // }
-
-
-
 }

@@ -39,8 +39,17 @@ public class SearchControl {
         }
     }
 
+    @PostMapping("/update/patient")
+    public ResponseEntity<Patient> updatePatient(@RequestBody Patient patient) {
+        try {
+            return new ResponseEntity<>(searchService.updatePatient(patient), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
-  
-    
+
+
+
 }

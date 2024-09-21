@@ -16,5 +16,9 @@ public class SearchRepository {
         return new Patient(); 
     }
 
+    //UPDATE
+    public Patient updatePatient(Patient patient){
+        return patient;
+    }
 
 }

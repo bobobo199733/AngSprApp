@@ -98,24 +98,26 @@ services:
       PGPORT: 5432
       PGHOST: aidbox-db
     
-  frontend-angular:
-    build:
-      dockerfile: frontend/patient-system/Dockerfile
-    ports:
-      - 4200:4200
-    volumes:
-      - ./frontend/patient-system:/frontend/patient-system
-      - /frontend/patient-system/node_modules
+#  frontend-angular:
+#    build:
+#      dockerfile: frontend/patient-system/Dockerfile
+#    ports:
+#      - 4200:4200
+#    volumes:
+#      - ./frontend/patient-system:/frontend/patient-system
+#     - /frontend/patient-system/node_modules
 
-  backend-spring-boot:
-    build:
-      dockerfile: backend/Dockerfile
-    image: backend-spring-boot
-    ports:
-      - 8080:8080
-    depends_on:
-      - frontend-angular
-    
+#  backend-spring-boot:
+#    build:
+#      dockerfile: backend/Dockerfile
+#    image: backend-spring-boot
+#    ports:
+#      - 8080:8080
+#    depends_on:
+#      - frontend-angular
+#    networks:
+#      - opensearch-net
+
 volumes:
   opensearch-data1:
   opensearch-data2:

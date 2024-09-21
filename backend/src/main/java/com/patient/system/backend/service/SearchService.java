@@ -12,6 +12,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import com.patient.system.backend.control.SearchControl;
+import com.patient.system.backend.repository.AidBoxRepository;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -32,7 +33,10 @@ public class SearchService {
 
     @Autowired
     private OpenSearchRepository openSearchRepository;
-    private static final Logger logger = LoggerFactory.getLogger(SearchControl.class);
+
+    @Autowired
+    private AidBoxRepository aidBoxRepository;
+    private static final Logger logger = LoggerFactory.getLogger(SearchService.class);
 
     HttpClient client;  
     HttpResponse<String> response;
@@ -122,9 +126,29 @@ public class SearchService {
             e.printStackTrace();
             logger.error("Error occurred while upserting patient: {}", e.getMessage(), e);
             System.out.println(HttpStatus.INTERNAL_SERVER_ERROR);
+            System.out.println(e.getMessage());;
             return null;
         } 
 
+    }
+
+    //UPDATE
+    public Patient updatePatient(Patient patient){
+        try{
+            client = HttpClient.newBuilder().sslContext(createInsecureSSLContext()).build();
+            //1) Update the patient in AidBox
+            response = client.send(aidBoxRepository.updatePatientAidBox(patient), HttpResponse.BodyHandlers.ofString());
+
+            //2) Update the patient in OpenSearch
+            response = client.send(openSearchRepository.updatePatientToOpenSearch(patient), HttpResponse.BodyHandlers.ofString());
+            logger.info("Patient updated successfully: {}", patient);
+
+            return searchRepository.updatePatient(patient);
+
+        } catch(Exception e) {
+            logger.error("Error occurred while updating patient: {}", e.getMessage(), e);
+            return null;
+        }
     }
 
     // Disable SSL verification - I'm connect to OpenSearch from localhost

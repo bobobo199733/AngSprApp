@@ -31,12 +31,12 @@ export class PatientSearchComponent {
   constructor(private httpClient: HttpClient) {}
 
 
-  
+
     ////////////////////////////
    /// Patient search method //
   ////////////////////////////
   searchPatient(searchText: string){
-    if(searchText != "" && searchText.length > 3){    
+    if(searchText != "" && searchText.length > 3){
         const headers = new HttpHeaders({'Content-Type': 'application/json','Accept': 'application/json'});
         const encodedName = encodeURIComponent(searchText);
         const url = `${this.apiUrl}?name="${encodedName}"`;
@@ -61,7 +61,6 @@ export class PatientSearchComponent {
             console.error('Error searching for patient:', err);
             this.patientNotFound = true;
             this.patientFound = false;
-            setTimeout(function(){window.location.reload();}, 1500);
           }
         });
     }

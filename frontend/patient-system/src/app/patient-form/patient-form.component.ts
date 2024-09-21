@@ -16,11 +16,13 @@ import { RouterOutlet, RouterModule, Router } from '@angular/router';
   styleUrl: './patient-form.component.css'
 })
 
-
 export class PatientFormComponent {
-  
+
   patientForm: FormGroup;
   isFormSubmitted: boolean = false;
+
+  formSubmitButton: boolean = true;
+  formUpdateButton: boolean = false;
 
   patient: Patient;
   patientList: Array<Patient> = patients;
@@ -30,22 +32,32 @@ export class PatientFormComponent {
   patientsResult: Patient[];
 
   apiUrl = "http://localhost:8080/data/upsert/patient";
+  apiUrl2 = "http://localhost:8080/search/update/patient";
   response: any;
+
+  //To retrieve the id from the routing parameters (see constructor)
+  idPatientFound: string;
 
     ///////////////////////////////
    /// Patient form constructor //
   ///////////////////////////////
   constructor(private httpClient: HttpClient, private route: ActivatedRoute, private router:Router){
         this.patientForm = new FormGroup({
-          name: new FormControl("",[Validators.required, Validators.minLength(4)]), 
-          dateOfBirth: new FormControl("",[Validators.required]), 
+          name: new FormControl("",[Validators.required, Validators.minLength(4)]),
+          dateOfBirth: new FormControl("",[Validators.required]),
           gender: new FormControl("",[Validators.required]),
           phoneNumber: new FormControl("",[Validators.required, Validators.pattern('(([+][(]?[0-9]{1,3}[)]?)|([(]?[0-9]{4}[)]?))\s*[)]?[-\s\.]?[(]?[0-9]{1,3}[)]?([-\s\.]?[0-9]{3})([-\s\.]?[0-9]{3,4})')      ])
         });
-        
+
         //Prepopulate the form if route is from search patient
         this.route.params.subscribe(params => {
+          this.idPatientFound = params['id'];
           let foundPatient = new Patient(params['name'],params['gender'],params['dateOfBirth'],params['phoneNumber']);
+          if (foundPatient.name && foundPatient.gender && foundPatient.dateOfBirth && foundPatient.phoneNumber){
+            this.formSubmitButton = false;
+            this.formUpdateButton = true;
+
+          }
           this.patientForm.patchValue({
             name: foundPatient.name,
             gender: foundPatient.gender,
@@ -56,6 +68,7 @@ export class PatientFormComponent {
   }
 
 
+
     ///////////////////////////////
    /// Form onSubmit() fucntion //
   ///////////////////////////////
@@ -63,35 +76,8 @@ export class PatientFormComponent {
     const isFormValid = this.patientForm.valid;
     this.isFormSubmitted = true;
 
-    
     if (isFormValid){
-
-      //Logic for duplicates - TODO
-      //this.httpClient.get(this.baseURL).subscribe((data)=>{ this.data = this.patient}) 
-     
-      //  for(let i in this.patientList){
-      //    if(this.patientList[i].firstName !== this.patientForm.controls['firstName'].value &&
-      //      this.patientList[i].lastName !== this.patientForm.controls['lastName'].value &&
-      //      this.patientList[i].dateOfBirth !== this.patientForm.controls['dateOfBirth'].value &&
-      //      this.patientList[i].gender !== this.patientForm.controls['gender'].value &&
-      //      this.patientList[i].phoneNumber !== this.patientForm.controls['phoneNumber'].value)
-      //      {
-      //          this.patient.firstName = this.patientForm.controls['firstName'].value;
-      //          this.patient.lastName = this.patientForm.controls['lastName'].value;
-      //          this.patient.dateOfBirth = this.patientForm.controls['dateOfBirth'].value;
-      //          this.patient.gender = this.patientForm.controls['gender'].value;
-      //          this.patient.phoneNumber = this.patientForm.controls['phoneNumber'].value;
-      //          this.showSuccessMessage = true;
-      //          this.httpClient.post(this.baseURL,this.patient).subscribe();  
-      //          setTimeout(function(){window.location.reload();}, 1500);
-      //    } else {
-      //      this.showFailMessage = true;
-      //      setTimeout(function(){window.location.reload();}, 1500);
-      //     
-      //    }      
-      //  }
-
-          //AidBox accepts only yyyy-MM-dd date format 
+          //AidBox accepts only yyyy-MM-dd date format
           let date = new Date(this.patientForm.controls['dateOfBirth'].value);
 
           this.patient = new Patient(
@@ -100,7 +86,7 @@ export class PatientFormComponent {
             formatDate(date,'yyyy-MM-dd',"en-US"),
             this.patientForm.controls['phoneNumber'].value
           )
-          
+
           const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
           this.httpClient.post<any>(this.apiUrl, this.patient, { headers }).subscribe({
             next: (res: { id: string, name: string, gender: string, dateOfBirth: string, phoneNumber: string }) => {
@@ -111,11 +97,46 @@ export class PatientFormComponent {
             },
             error: (err) => {
                 this.showFailMessage = true;
-                setTimeout(function(){window.location.reload();}, 1500);
                 console.error('Error upserting patient:', err);
             }
           });
     }
- 
+
+  }
+
+    ///////////////////////////////
+   /// Form onUpdate() function //
+  ///////////////////////////////
+  onUpdate(){
+    const isFormValid = this.patientForm.valid;
+    this.isFormSubmitted = true;
+
+    if (isFormValid){
+          //AidBox accepts only yyyy-MM-dd date format
+          let date = new Date(this.patientForm.controls['dateOfBirth'].value);
+
+          this.patient = new Patient(
+            this.patientForm.controls['name'].value,
+            this.patientForm.controls['gender'].value,
+            formatDate(date,'yyyy-MM-dd',"en-US"),
+            this.patientForm.controls['phoneNumber'].value
+          )
+          this.patient.id = this.idPatientFound;
+
+          const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+          this.httpClient.post<any>(this.apiUrl2, this.patient, { headers }).subscribe({
+            next: (res) => {
+                console.log('Response from Spring Boot:', res);
+                this.showSuccessMessage = true;
+                setTimeout(function(){window.location.href="http://localhost:4200/patient-form";}, 1500);
+            },
+            error: (err) => {
+                this.showFailMessage = true;
+                console.error('Error updating patient:', err);
+            }
+          });
+
+    }
+
   }
 }

@@ -1,10 +1,12 @@
 package com.patient.system.backend.repository;
 
+import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import com.patient.system.backend.entity.Patient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -18,9 +20,12 @@ public class OpenSearchRepository {
     String username;
     @Value("${openSearchPassword}")
     String password;
+    @Value("${openSearchUrlBase}")
+    private String openSearchUrlBase;
     
     //Index a patient HTTP request to OpenSearch
     public HttpRequest indexPatientToOpenSearch(String jsonPayload, String patientId){
+
         //OpenSearch requires that the basic authentication header to be encoded to base65
         String auth = username + ":" + password;
         String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
@@ -28,7 +33,7 @@ public class OpenSearchRepository {
         
         //Register the patient to AidBox
         request = HttpRequest.newBuilder()
-        .uri(URI.create("https://localhost:9200/patients/_doc/"+patientId+"?pretty"))
+        .uri(URI.create(openSearchUrlBase.concat("/patients/_doc/"+patientId+"?pretty")))
         .header("Content-Type", "application/json")
         .header("Authorization", authHeader) //OpenSearch auth.
         .PUT(HttpRequest.BodyPublishers.ofString(jsonPayload))
@@ -36,7 +41,7 @@ public class OpenSearchRepository {
 
         return request;
     }
-//host.docker.internal
+
     //Search a patient HTTP request to OpenSearch
     public HttpRequest searchPatientFromOpenSearch(String patientName){
         //OpenSearch requires that the basic authentication header to be encoded to base65
@@ -46,10 +51,46 @@ public class OpenSearchRepository {
         
         //Register the patient to AidBox
         request = HttpRequest.newBuilder()
-        .uri(URI.create("https://0.0.0.0:9200/patients/_search?q=name:%22".concat(patientName).concat("%22?case_insensitive=true?pretty")))
+        .uri(URI.create(openSearchUrlBase.concat("/patients/_search?q=name:%22".concat(patientName).concat("%22?case_insensitive=true?pretty"))))
         .header("Authorization", authHeader) //OpenSearch auth.
         .GET()
         .build();
+
+        return request;
+    }
+
+    //Update a patient details
+    public HttpRequest updatePatientToOpenSearch(Patient patient){
+        String jsonPayload = String.format( """
+                {
+                    "doc":{
+                        "id" : "%s",
+                        "name" : "%s",
+                        "gender" : "%s",                
+                        "dateOfBirth" : "%s",
+                        "phoneNumber" : "%s"
+                    }
+                }
+                """,
+                patient.getId(),
+                patient.getName(),
+                patient.getGender(),
+                patient.getDateOfBirth(),
+                patient.getPhoneNumber());
+
+        //OpenSearch requires that the basic authentication header to be encoded to base65
+        String auth = username + ":" + password;
+        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+        String authHeader = "Basic " + encodedAuth;
+
+        //Register the patient to AidBox
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(openSearchUrlBase.concat("/patients/_update/"+ patient.getId())))
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .header("Authorization", authHeader) //OpenSearch auth.
+                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload,StandardCharsets.UTF_8))
+                .build();
 
         return request;
     }
