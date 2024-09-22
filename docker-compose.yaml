@@ -26,6 +26,8 @@ services:
     ports:
       - "${OPENSEARCH_NODE1_PORT1}:${OPENSEARCH_NODE1_PORT1}" # REST API
       - "${OPENSEARCH_NODE1_PORT2}:${OPENSEARCH_NODE1_PORT2}" # Performance Analyzer
+
+
   opensearch-node2:
     image: opensearchproject/opensearch:latest # This should be the same image used for opensearch-node1 to avoid issues
     container_name: opensearch-node2
@@ -92,7 +94,7 @@ services:
       AIDBOX_ZEN_DEV_MODE: "true"
       PGPORT: 5432
       PGHOST: aidbox-db
-    
+
   frontend-angular:
     build:
       dockerfile: frontend/patient-system/Dockerfile
