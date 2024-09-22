@@ -20,7 +20,6 @@ export class PatientSearchComponent {
   apiUrl = environment.springBootSearchSearchPatientURL;
 
   patient = new Patient('null', 'null', 'null', 'null');
-  patientList: Array<Patient> = [];
 
   patientFound = false;
   patientNotFound = false;
@@ -37,7 +36,7 @@ export class PatientSearchComponent {
    /// Patient search method //
   ////////////////////////////
   searchPatient(searchText: string){
-    if(searchText != "" && searchText.length > 3){
+    if(searchText != "" && searchText.length >= 3){
         const headers = new HttpHeaders({'Content-Type': 'application/json','Accept': 'application/json'});
         const encodedName = encodeURIComponent(searchText);
         const url = `${this.apiUrl}?name="${encodedName}"`;

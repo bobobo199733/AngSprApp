@@ -3,7 +3,6 @@ import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http'
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
-import { patients } from '../../../db-mock/db.json';
 import { Patient } from '../model/patient';
 import { environment } from '../environments/environment';
 
@@ -24,11 +23,9 @@ export class PatientFormComponent {
   formUpdateButton: boolean = false;
 
   patient: Patient;
-  patientList: Array<Patient> = patients;
 
   showSuccessMessage = false;
   showFailMessage = false;
-  patientsResult: Patient[];
 
   apiUrl = environment.springBootDataInsertPatientURL;
   apiUrl2 = environment.springBootSearchUpdatePatientURL;
