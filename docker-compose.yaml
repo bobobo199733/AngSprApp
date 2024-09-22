@@ -26,8 +26,6 @@ services:
     ports:
       - "${OPENSEARCH_NODE1_PORT1}:${OPENSEARCH_NODE1_PORT1}" # REST API
       - "${OPENSEARCH_NODE1_PORT2}:${OPENSEARCH_NODE1_PORT2}" # Performance Analyzer
-    networks:
-      - opensearch-net # All of the containers will join the same Docker bridge network
   opensearch-node2:
     image: opensearchproject/opensearch:latest # This should be the same image used for opensearch-node1 to avoid issues
     container_name: opensearch-node2
@@ -50,8 +48,6 @@ services:
       - opensearch-data2:/usr/share/opensearch/data
     env_file:
       - .env
-    networks:
-      - opensearch-net
   opensearch-dashboards:
     image: opensearchproject/opensearch-dashboards:latest # Make sure the version of opensearch-dashboards matches the version of opensearch installed on other nodes
     container_name: opensearch-dashboards
@@ -61,8 +57,7 @@ services:
       - "5601" # Expose port 5601 for web access to OpenSearch Dashboards
     environment:
       OPENSEARCH_HOSTS: '["https://opensearch-node1:9200","https://opensearch-node2:9200"]' # Define the OpenSearch nodes that OpenSearch Dashboards will query
-    networks:
-      - opensearch-net
+
 
   # AIDBOX SERVICE CONFIG
   aidbox-db:
@@ -98,29 +93,25 @@ services:
       PGPORT: 5432
       PGHOST: aidbox-db
     
-#  frontend-angular:
-#    build:
-#      dockerfile: frontend/patient-system/Dockerfile
-#    ports:
-#      - 4200:4200
-#    volumes:
-#      - ./frontend/patient-system:/frontend/patient-system
-#     - /frontend/patient-system/node_modules
+  frontend-angular:
+    build:
+      dockerfile: frontend/patient-system/Dockerfile
+    ports:
+      - 4200:4200
+    volumes:
+      - ./frontend/patient-system:/frontend/patient-system
+      - /frontend/patient-system/node_modules
 
-#  backend-spring-boot:
-#    build:
-#      dockerfile: backend/Dockerfile
-#    image: backend-spring-boot
-#    ports:
-#      - 8080:8080
-#    depends_on:
-#      - frontend-angular
-#    networks:
-#      - opensearch-net
+  backend-spring-boot:
+    build:
+      dockerfile: backend/Dockerfile
+    image: backend-spring-boot
+    ports:
+      - 8080:8080
+    depends_on:
+      - frontend-angular
 
 volumes:
   opensearch-data1:
   opensearch-data2:
   aidbox_pg_data: {}
-networks:
-  opensearch-net:
