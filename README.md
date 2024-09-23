@@ -1,13 +1,14 @@
 
 # 🏥 Patient System
 
-## 📋 Requirements
+## 📋 Requirements to run with Docker
+- **Docker** & **Docker Compose**
 
+## 📋 Requirements to run manually
 ### Frontend
 - **npm**: v10.8.3
 - **Angular**: v18
-- (Optional) **json-server**: latest - to run the FE without the BE but needs changing the endpoints in the code.
-
+  
 ### OpenSearch and AidBox
 - **Docker** & **Docker Compose**
 
@@ -19,6 +20,21 @@
 
 ---
 
+## ⚠️ Run via Docker
+1. Clone the repo.
+2. Navigate to the frontend directory:
+   ```bash
+   cd repo/
+   ```
+3. Run docker-compose.yaml file:
+   ```bash
+   docker-compose up -d 
+   ```
+⚠️ For the app to work you need to wait for the AidBox container to be up and running ⚠️
+
+---
+## ⚠️ Run manually
+---
 ## 🚀 Run Frontend (FE)
 
 1. Clone the repo.
@@ -26,19 +42,15 @@
    ```bash
    cd repo/frontend/patient-system/
    ```
-3. Start the Angular application:
+3. Run from frontend directory:
+   ```bash
+   npm install
+   ```
+4. Start the Angular application:
    ```bash
    ng serve
    ```
-4. (Optional) In a new terminal, navigate to the mock database directory:
-   ```bash
-   cd repo/frontend/patient-system/db-mock/
-   ```
-5. (Optional) Start the json-server:
-   ```bash
-   json-server db.json
-   ```
-6. Open your web browser and go to: [http://localhost:4200/](http://localhost:4200/)
+5. Open your web browser and go to: [http://localhost:4200/](http://localhost:4200/)
 
 ---
 
@@ -49,11 +61,16 @@
    ```bash
    cd repo/
    ```
-3. In the terminal, run the following command:
+3. Edit the docker-compose.yaml file by commenting on the following services:
+   ```bash
+   frontend-angular
+   backend-spring-boot
+   ```
+4. In the terminal, run the following command:
    ```bash
    docker-compose up -d
    ```
-4. To stop the Docker container, use:
+5. To stop the Docker container, use:
    ```bash
    docker-compose down
    ```
@@ -63,29 +80,25 @@
 ## 🔙 Run Backend (BE)
 
 1. Clone the repo.
-2. Navigate to the backend directory:
+2. Navigate to the backend directory JAR:
    ```bash
-   cd repo/backend/
+   cd repo/backend/build/libs/
    ```
 3. Start the Spring Boot application:
    ```bash
-   gradle bootRun
+   java -jar backend-0.0.1-SNAPSHOT.jar
    ```
-4. (Optional) Import the Postman JSON file into your Postman client to test the endpoints of the Spring Boot Application.
+4. Change from application.properties the following:
+   ```bash
+   http://aidbox:8888/fhir/Patient/ ==> http://localhost:8888/fhir/Patient/
+   http://opensearch-node1:9200 ==> http://localhost:9200
+   ```
 
 ---
 
-## ⚠️ Issues
+## ⚠️ Extra features
+1. Search the patient by name or phone number.
 
-- Accepts duplicates.
-- Returns only the last value when a certain patient is searched e.g., two patients have the same first name.
-- Upon updating a patient's details, it inserts a new record instead of updating the old one.
-
----
-
-## ⚠️ TODOs
-
-- Swagger Documentation for the BE.
 
 ---
 
