@@ -20,7 +20,7 @@
 
 ---
 
-## ⚠️ Run via Docker
+## Run everything via Docker-Compose (AidBox, OpenSearch, Frontend and Backend 🚀)
 1. Clone the repo.
 2. Navigate to the frontend directory:
    ```bash
@@ -30,10 +30,23 @@
    ```bash
    docker-compose up -d 
    ```
-⚠️ For the app to work you need to wait for the AidBox container to be up and running ⚠️
+4. Wait for the AidBox: **"aidbox" container** to be up and running:
+   ![Screenshot 2024-09-23 180057](https://github.com/user-attachments/assets/b5d0abd9-98f7-4209-b216-a8151872ee23)
+   
+5. Open a browser of choice and go to URL: 
+   ```bash
+   http://localhost:8888/ui/console#/sandbox/basic
+   ```
+6. From the image below set the **Client Id = basic and Client Secret = secret**, and press all three **RUN** buttons: 
+   ![Screenshot 2024-09-23 174712](https://github.com/user-attachments/assets/8d337f5a-f88b-4c5d-90b8-c7d97c692799)
 
+7. Voilà, the app is available at:
+   ```bash
+    http://localhost:4200/patient-form
+   ```
+   
 ---
-## ⚠️ Run manually
+## Run manually 🚀
 ---
 ## 🚀 Run Frontend (FE)
 
@@ -82,7 +95,7 @@
 1. Clone the repo.
 2. Navigate to the backend directory JAR:
    ```bash
-   cd repo/backend/build/libs/
+   cd repo/backend/
    ```
 3. Start the Spring Boot application:
    ```bash
@@ -96,9 +109,15 @@
 
 ---
 
+## ⚠️ Swagger documentation is available at:
+   ```bash
+   http://localhost:8080/swagger-ui/index.html#/
+   ```
+
+---
+
 ## ⚠️ Extra features
 1. Search the patient by name or phone number.
-
 
 ---
 
