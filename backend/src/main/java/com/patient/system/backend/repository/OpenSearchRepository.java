@@ -1,6 +1,5 @@
 package com.patient.system.backend.repository;
 
-import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -58,11 +57,14 @@ public class OpenSearchRepository {
 
     //Search a patient HTTP request to OpenSearch
     public HttpRequest searchPatientFromOpenSearch(String patientName){
+
         String jsonPayload = String.format( """
                 {
                     "query": {
-                        "match_phrase_prefix": {
-                            "name": "%s"
+                        "multi_match": {
+                            "query": %s,
+                            "type": "phrase_prefix",
+                            "fields": ["name", "phoneNumber"]
                         }
                     }
                 }

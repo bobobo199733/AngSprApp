@@ -6,6 +6,8 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -64,12 +66,10 @@ public class SearchService {
             //HTTP client only for OpenSearch which trust all the SSL certificates
             client = HttpClient.newBuilder().sslContext(createInsecureSSLContext()).build();  
             
-            Patient patient = new Patient();  
-            
-            String encodedPatientName = URLEncoder.encode(name, StandardCharsets.UTF_8.toString());
+            Patient patient = new Patient();
 
-            response = client.send(openSearchRepository.searchPatientFromOpenSearch(encodedPatientName), HttpResponse.BodyHandlers.ofString());
-          
+            response = client.send(openSearchRepository.searchPatientFromOpenSearch(name), HttpResponse.BodyHandlers.ofString());
+
             jsonObject = new JSONObject(response.body());
             System.out.println(jsonObject);
 
@@ -77,27 +77,20 @@ public class SearchService {
             System.out.println(openSearchPatientDetailsArray);
 
             if(openSearchPatientDetailsArray.length() > 0){
+                JSONObject hitObject = openSearchPatientDetailsArray.getJSONObject(0);
+                JSONObject sourceObject = hitObject.getJSONObject("_source");
 
-                //For future, in case two patients have the same name
-                //IMPORTANT! In case the use case of multiple patients under the same name is implemented, the return type must be a list of patients e.g., List<Patient>
-                for(int i=0; i<openSearchPatientDetailsArray.length(); i++){
-                    JSONObject hitObject = openSearchPatientDetailsArray.getJSONObject(i);
-                    JSONObject sourceObject = hitObject.getJSONObject("_source");
-
-                    patient.setId(sourceObject.getString("id"));
-                    patient.setName(sourceObject.getString("name"));
-                    patient.setGender(sourceObject.getString("gender"));
-                    patient.setDateOfBirth(sourceObject.getString("dateOfBirth"));
-                    patient.setPhoneNumber(sourceObject.getString("phoneNumber"));
-
-                }
+                patient.setId(sourceObject.getString("id"));
+                patient.setName(sourceObject.getString("name"));
+                patient.setGender(sourceObject.getString("gender"));
+                patient.setDateOfBirth(sourceObject.getString("dateOfBirth"));
+                patient.setPhoneNumber(sourceObject.getString("phoneNumber"));
 
                 System.out.println("Patient was found!");
                 logger.info("Patient was found");
                 return patient;
 
             } else{
-
                 System.out.println("Patient was not found!");
                 logger.info("Patient was not found");
                 return null;
@@ -118,6 +111,7 @@ public class SearchService {
     public Patient updatePatient(Patient patient){
         try{
             client = HttpClient.newBuilder().sslContext(createInsecureSSLContext()).build();
+
             //1) Update the patient in AidBox
             response = client.send(aidBoxRepository.updatePatientAidBox(patient), HttpResponse.BodyHandlers.ofString());
 
