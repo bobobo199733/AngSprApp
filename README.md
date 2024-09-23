@@ -31,16 +31,28 @@
    docker-compose up -d 
    ```
 4. Wait for the AidBox: **"aidbox" container** to be up and running:
-   ![Screenshot 2024-09-23 180057](https://github.com/user-attachments/assets/b5d0abd9-98f7-4209-b216-a8151872ee23)
    
-5. Open a browser of choice and go to URL: 
+   You can verify the log of the aidbox container via the following command:
+   ```bash
+   docker logs --details aidbox 
+   ```
+   When it is ready it will show in the console:
+   
+   ![Screenshot 2024-09-23 180057](https://github.com/user-attachments/assets/b5d0abd9-98f7-4209-b216-a8151872ee23)
+
+  ⚠️ Step 3) depends heavily on the environment and configuration of the machine in which the container is created ⚠️
+  
+  ⚠️ In general, it will take some time (approx. 1-3 min.) because it needs to pull from Docker Hub the AidBox image + to pull from GitHub the PostgreSQL database & Zen Packages ⚠️
+
+   
+6. Open a browser of choice and go to URL: 
    ```bash
    http://localhost:8888/ui/console#/sandbox/basic
    ```
-6. From the image below set the **Client Id = basic and Client Secret = secret**, and press all three **RUN** buttons: 
+7. From the image below set the **Client Id = basic and Client Secret = secret**, and press all three **RUN** buttons: 
    ![Screenshot 2024-09-23 174712](https://github.com/user-attachments/assets/8d337f5a-f88b-4c5d-90b8-c7d97c692799)
 
-7. Voilà, the app is available at:
+8. Voilà, the app is available at:
    ```bash
     http://localhost:4200/patient-form
    ```
