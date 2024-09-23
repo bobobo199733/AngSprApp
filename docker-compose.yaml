@@ -113,9 +113,9 @@ services:
     container_name: backend-spring-boot
     ports:
       - 8080:8080
+   
 
 volumes:
   opensearch-data1:
   opensearch-data2:
   aidbox_pg_data: {}
-

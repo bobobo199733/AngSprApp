@@ -6,6 +6,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 import com.patient.system.backend.repository.OpenSearchRepository;
 import org.json.JSONObject;
@@ -17,6 +19,10 @@ import org.springframework.stereotype.Service;
 
 import com.patient.system.backend.entity.Patient;
 import com.patient.system.backend.repository.AidBoxRepository;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 @Service
 public class DataService{
@@ -43,8 +49,10 @@ public class DataService{
     //Create a new patient
     public Patient addPatient(Patient patient){
         try {
+
             //Register the patient to AidBox
             response = client.send(aidBoxRepository.insertPatientToAidBox(patient), HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
 
             //Set the ID of the patient with the one assigned by AidBox
             jsonObject = new JSONObject(response.body());
@@ -53,10 +61,16 @@ public class DataService{
             //Log for AidBox
             logger.info("Patient upserted successfully: {}", patient);
 
-            //If the patient is successfully registered to AidBox
-            //Then access Search Service endpoint to index the new patient in OpenSearch
+
+            //If the patient is successfully registered to AidBox => OpenSearch
             if(response.statusCode() == 201 || response.statusCode() == 200){
+                //Create index in OpenSearch
+                response = client.send(openSearchRepository.createIndexPatientOpenSearch(), HttpResponse.BodyHandlers.ofString());
+                System.out.println("Index response body:" + response.body());
+
+                // Index patient in OpenSearch
                 response = client.send(openSearchRepository.indexPatientToOpenSearch(patient), HttpResponse.BodyHandlers.ofString());
+                System.out.println("Index creation response body:" + response.body());
 
                 //Console print-outs for OpenSearch
                 System.out.println("Patient indexed successfully in OpenSearch!");
@@ -78,5 +92,22 @@ public class DataService{
             return null;
         }
 
+    }
+
+    // Disable SSL verification
+    // I'm using a self-signed SSL certificate, which is not trusted by the Java HttpClient.
+    private static SSLContext createInsecureSSLContext() throws NoSuchAlgorithmException, KeyManagementException {
+        TrustManager[] trustAllCertificates = new TrustManager[]{
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+                    public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+                    public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+                }
+        };
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+        sslContext.init(null, trustAllCertificates, new java.security.SecureRandom());
+        return sslContext;
     }
 }

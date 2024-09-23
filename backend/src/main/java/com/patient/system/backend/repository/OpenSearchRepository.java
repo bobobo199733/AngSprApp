@@ -21,7 +21,59 @@ public class OpenSearchRepository {
     String password;
     @Value("${openSearchUrlBase}")
     private String openSearchUrlBase;
-    
+
+    //Create index patient HTTP request to OpenSearch
+    public HttpRequest createIndexPatientOpenSearch(){
+            String jsonPayload = """
+                    {
+                      "settings": {
+                        "index": {
+                          "number_of_shards": 1,
+                          "number_of_replicas": 1
+                        }
+                      },
+                      "mappings": {
+                        "properties": {
+                          "id": {
+                            "type": "text"
+                          },
+                          "name": {
+                            "type": "text"
+                          },
+                          "gender": {
+                            "type": "text"
+                          },
+                          "dateOfBirth": {
+                            "type": "text"
+                          },
+                          "phoneNumber": {
+                            "type": "text"
+                          }
+                        }
+                      }
+                    }
+                    """;
+
+            System.out.println(jsonPayload);
+
+            //OpenSearch requires that the basic authentication header to be encoded to base65
+            String auth = username + ":" + password;
+            String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+            String authHeader = "Basic " + encodedAuth;
+
+            //Register the patient to OpenSearch
+            request = HttpRequest.newBuilder()
+                    .uri(URI.create(openSearchUrlBase.concat("/patients")))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", authHeader) //OpenSearch auth.
+                    .PUT(HttpRequest.BodyPublishers.ofString(jsonPayload, StandardCharsets.UTF_8))
+                    .build();
+
+            return request;
+
+    }
+
+
     //Index a patient HTTP request to OpenSearch
     public HttpRequest indexPatientToOpenSearch(Patient patient){
         String jsonPayload = String.format( """
@@ -38,7 +90,7 @@ public class OpenSearchRepository {
                 patient.getGender(),
                 patient.getDateOfBirth(),
                 patient.getPhoneNumber());
-
+        System.out.println(jsonPayload);
         //OpenSearch requires that the basic authentication header to be encoded to base65
         String auth = username + ":" + password;
         String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
@@ -51,7 +103,6 @@ public class OpenSearchRepository {
             .header("Authorization", authHeader) //OpenSearch auth.
             .PUT(HttpRequest.BodyPublishers.ofString(jsonPayload,StandardCharsets.UTF_8))
             .build();
-
         return request;
     }
 
