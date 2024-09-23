@@ -49,10 +49,17 @@
    ```bash
    http://localhost:8888/ui/console#/sandbox/basic
    ```
-6. From the image below set the **Client Id = basic and Client Secret = secret**, and press all three **RUN** buttons: 
+
+   The credentials for the AidBox portal are the following:
+   ```bash
+   Username: admin
+   Password: password
+   ```
+   
+7. From the image below set the **Client Id = basic and Client Secret = secret**, and press all three **RUN** buttons: 
    ![Screenshot 2024-09-23 174712](https://github.com/user-attachments/assets/8d337f5a-f88b-4c5d-90b8-c7d97c692799)
 
-7. Voilà, the app is available at:
+8. Voilà, the app is available at:
    ```bash
     http://localhost:4200/patient-form
    ```
