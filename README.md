@@ -40,7 +40,7 @@
    
    ![Screenshot 2024-09-23 180057](https://github.com/user-attachments/assets/b5d0abd9-98f7-4209-b216-a8151872ee23)
 
-   ⚠️ Step 3) depends heavily on the environment and configuration of the machine in which the container is created ⚠️
+   ⚠️ Step 3) depends heavily on the environment and configuration of the machine on which the container is created ⚠️
   
    ⚠️ In general, it will take some time (approx. 1-3 min.) because it needs to pull from Docker Hub the AidBox image + to pull from GitHub the PostgreSQL database & Zen Packages ⚠️
 
