@@ -19,7 +19,7 @@
 - (Optional) **Postman**: latest - to access the endpoints of the BE.
 
 ---
-http://localhost:8080/swagger-ui/index.html#/
+
 ## Run everything via Docker-Compose (AidBox, OpenSearch, Frontend and Backend 🚀)
 1. Clone the repo.
 2. Navigate to the frontend directory:
