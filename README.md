@@ -1,8 +1,7 @@
 
 # 🏥 Patient System
 
-# 🏥 [DEMO](http://5.13.141.29:4200)
-
+# Demo available [HERE](http://5.13.141.29:4200)
 
 ## 📋 Requirements to run with Docker
 - **Docker** & **Docker Compose**
